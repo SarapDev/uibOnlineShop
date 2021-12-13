@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Uib Online Shop</string>
+    <string name="edit_message">Edit Message</string>
+    <string name="button_send">Button</string>
+    <string name="product_image">Product image</string>
+    <string name="button_name">Show product</string>
+</resources>
