@@ -1,11 +1,14 @@
 package com.example.uibonlineshop;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,31 +19,29 @@ import java.util.List;
 import java.util.Map;
 
 public class ApiService {
-    private final String apiRoute = "https://f218-95-57-109-201.ngrok.io/api";
 
-    public List<JSONObject> sendRequest(Map<String, String> data) {
+    private final Context ctx;
+
+    public ApiService(Context ctx) {
+        this.ctx = ctx;
+    }
+
+    public void sendRequest(Map<String, String> data, final ServerCallback callback) {
+        String apiRoute = "https://eshop-api-uib.herokuapp.com/api";
         String fullRoute = apiRoute + data.get("url");
-        List<JSONObject> res = new ArrayList<JSONObject>();
-        new JsonObjectRequest
-                (Request.Method.GET, fullRoute, null, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray data = response.getJSONArray("data");
-                            for (int i = 0; i <= data.length(); ++i) {
-                                res.add(data.getJSONObject(i));
-                            }
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+        JsonObjectRequest request = new JsonObjectRequest
+                (Request.Method.GET, fullRoute, null, response -> {
+                    try {
+                        JSONArray data1 = response.getJSONArray("data");
+                        callback.onSuccess(data1);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.i("VolleyErr", error.toString());
-                    }
-                });
-        return res;
+                }, error -> Log.i("VolleyErr", error.toString()));
+
+        RequestQueue mRequestQueue = Volley.newRequestQueue(ctx);
+        mRequestQueue.add(request);
     }
 }
